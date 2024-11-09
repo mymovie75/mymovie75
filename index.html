@@ -20,7 +20,6 @@
             align-items: center;
             min-height: 100vh;
         }
-        /* Prevent links from turning purple after being clicked */
         a, a:visited {
             color: inherit;
             text-decoration: none;
@@ -28,7 +27,6 @@
         a:hover {
             color: #f0a500;
         }
-        /* Header & Search Bar */
         .header {
             width: 100%;
             padding: 20px;
@@ -78,7 +76,6 @@
             cursor: pointer;
             border-radius: 5px;
         }
-        /* Movie Grid */
         .movie-grid {
             display: flex;
             flex-wrap: wrap;
@@ -118,7 +115,6 @@
             font-size: 0.8rem;
             color: #f0a500;
         }
-        /* Modal Styles */
         .modal {
             display: none;
             position: fixed;
@@ -166,13 +162,13 @@
     </style>
 </head>
 <body>
-  
-    
-    
-    <!-- Header with Genre Modal Button and Search Bar -->
+
+    <!-- Header with Genre Modal Button, Movie/Series Selection, and Search Bar -->
     <header class="header">
         <div class="header-buttons">
             <button onclick="openModal()">Genres</button>
+            <button onclick="selectType('فلم')">فلم</button>
+            <button onclick="selectType('مسلسل')">مسلسل</button>
         </div>
         <div class="search-bar">
             <input type="text" id="searchInput" oninput="searchMovies()" placeholder="أدخل اسم الفيلم">
@@ -181,49 +177,38 @@
         </div>
     </header>
 
- 
-    
-    
-    
     <!-- Movie Grid -->
     <div class="movie-grid" id="movieGrid">
-        <!-- Movie Item Template (Repeat this for each movie) -->
-        <div class="movie-item" data-title="King Arthur" data-genre="Action" data-year="2017">
+        <!-- Movie Item Template -->
+        <div class="movie-item" data-title="King Arthur" data-genre="Action" data-year="2017" data-type="فلم">
             <a href="https://example.com/movie1">
                 <img src="images.jpg" alt="Description">
                 <div class="movie-info">
                     <h3>King Arthur</h3>
-                    <p>6.7 ★ | 2017 |<a href="https://www.youtube.com/watch?v=jIM4-HLtUM0&pp=ygUTa2luZyBhcnRodXIgdHJhaWxlcg%3D%3D" target="_blank">trailer</a></p>
+                    <p>6.7 ★ | 2017 | <a href="https://www.youtube.com/watch?v=jIM4-HLtUM0" target="_blank">trailer</a></p>
                 </div>
             </a>
         </div>
-        <div class="movie-item" data-title="Joker 2" data-genre="Drama" data-year="2024">
+        <div class="movie-item" data-title="Joker 2" data-genre="Drama" data-year="2024" data-type="فلم">
             <a href="c:\Users\win10\Desktop\[arabseed].Joker.2019.TrueHD.1080p.BluRay.mp4">
-                <img src="הורדה (21).jpg" alt="Description" alt="Description">
+                <img src="הורדה (21).jpg" alt="Description">
                 <div class="movie-info">
                     <h3>Joker 2</h3>
-                    <p>7.2 ★ | 2024 |<a href="https://www.youtube.com/watch?v=_OKAwz2MsJs&pp=ygUPam9rZXIgMiB0cmFpbGVy" target="_blank">trailer</a></p>
+                    <p>7.2 ★ | 2024 | <a href="https://www.youtube.com/watch?v=_OKAwz2MsJs" target="_blank">trailer</a></p>
                 </div>
             </a>
         </div>
-        <div class="movie-item" data-title="Arcane 2" data-genre="Action" data-year="2024">
+        <div class="movie-item" data-title="Arcane 2" data-genre="Action" data-year="2024" data-type="مسلسل">
             <a href="https://disk.yandex.com/d/rl-klVnRZZsBog">
                 <img src="arcane 2.jpg" alt="Description">
                 <div class="movie-info">
                     <h3>Arcane 2</h3>
-                    <p>9.0 ★ | 2024 |<a href="https://www.youtube.com/watch?v=ysqiEC6bLUI&pp=ygUXYXJjYW5lIHNlYXNvbiAyIHRyYWlsZXI%3D" target="_blank">trailer</a></p>
+                    <p>9.0 ★ | 2024 | <a href="https://www.youtube.com/watch?v=ysqiEC6bLUI" target="_blank">trailer</a></p>
                 </div>
             </a>
         </div>
-        
-        <!-- Add more movies here following the same structure -->
     </div>
 
-
-
-
-
-    
     <!-- Modal for Genre Selection -->
     <div class="modal" id="genreModal">
         <div class="modal-content">
@@ -238,15 +223,15 @@
     </div>
 
     <script>
-        // Open the Genre Modal
+        // Open and Close Genre Modal
         function openModal() {
             document.getElementById('genreModal').style.display = 'flex';
         }
-        // Close the Genre Modal
         function closeModal() {
             document.getElementById('genreModal').style.display = 'none';
         }
-        // Select a Genre and Filter Movies
+        
+        // Filter by Genre
         function selectGenre(genre) {
             closeModal();
             const movies = document.querySelectorAll('.movie-item');
@@ -259,19 +244,26 @@
                 }
             });
         }
-    
-        
-        
-        
-        // Search Movies by Title and Year
+
+        // Filter by Type (فلم or مسلسل)
+        function selectType(type) {
+            const movies = document.querySelectorAll('.movie-item');
+            movies.forEach(movie => {
+                const movieType = movie.getAttribute('data-type');
+                movie.style.display = movieType === type ? 'block' : 'none';
+            });
+        }
+
+        // Search by Title and Year
         function searchMovies() {
-            const titleQuery = document.getElementById('searchInput').value.toLowerCase();
-            const yearQuery = document.getElementById('yearInput').value;
+            const searchInput = document.getElementById('searchInput').value.toLowerCase();
+            const yearInput = document.getElementById('yearInput').value;
             const movies = document.querySelectorAll('.movie-item');
             movies.forEach(movie => {
                 const title = movie.getAttribute('data-title').toLowerCase();
                 const year = movie.getAttribute('data-year');
-                if (title.includes(titleQuery) && (yearQuery === '' || year === yearQuery)) {
+                if ((title.includes(searchInput) || searchInput === '') && 
+                    (year === yearInput || yearInput === '')) {
                     movie.style.display = 'block';
                 } else {
                     movie.style.display = 'none';
