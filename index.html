@@ -38,7 +38,7 @@
         .header-buttons {
             display: flex;
             gap: 15px;
-            margin-bottom: 20px;
+            margin-bottom: 10px;
         }
         .header-buttons button {
             background-color: #e94560;
@@ -58,6 +58,7 @@
             width: 70%;
             max-width: 700px;
             gap: 10px;
+            margin-bottom: 10px;
         }
         .search-bar input[type="text"], .search-bar input[type="number"] {
             padding: 10px;
@@ -75,6 +76,29 @@
             font-size: 1rem;
             cursor: pointer;
             border-radius: 5px;
+        }
+        .active-filters {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-bottom: 10px;
+        }
+        .filter-tag {
+            background-color: #e94560;
+            padding: 5px 10px;
+            border-radius: 5px;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        .filter-tag .remove-filter {
+            background-color: transparent;
+            color: #fff;
+            font-weight: bold;
+            cursor: pointer;
+            border: none;
+            padding: 0;
+            font-size: 1rem;
         }
         .movie-grid {
             display: flex;
@@ -175,10 +199,12 @@
             <input type="number" id="yearInput" oninput="searchMovies()" placeholder="أدخل السنة" min="1900" max="2100">
             <button onclick="searchMovies()">بحث</button>
         </div>
+        <!-- Active Filters Display -->
+        <div class="active-filters" id="activeFilters"></div>
     </header>
 
     <!-- Movie Grid -->
-    <div class="movie-grid" id="movieGrid">
+    < <div class="movie-grid" id="movieGrid">
         <!-- Movie Item Template -->
         <div class="movie-item" data-title="King Arthur" data-genre="Action" data-year="2017" data-type="فلم">
             <a href="https://example.com/movie1">
@@ -223,53 +249,62 @@
     </div>
 
     <script>
-        // Open and Close Genre Modal
-        function openModal() {
-            document.getElementById('genreModal').style.display = 'flex';
-        }
-        function closeModal() {
-            document.getElementById('genreModal').style.display = 'none';
-        }
-        
-        // Filter by Genre
-        function selectGenre(genre) {
-            closeModal();
-            const movies = document.querySelectorAll('.movie-item');
-            movies.forEach(movie => {
-                const movieGenre = movie.getAttribute('data-genre');
-                if (genre === '' || movieGenre === genre) {
-                    movie.style.display = 'block';
-                } else {
-                    movie.style.display = 'none';
+        let filters = { genre: '', type: '', year: '' };
+
+        function openModal() { document.getElementById('genreModal').style.display = 'flex'; }
+        function closeModal() { document.getElementById('genreModal').style.display = 'none'; }
+
+        function updateActiveFilters() {
+            const activeFiltersContainer = document.getElementById('activeFilters');
+            activeFiltersContainer.innerHTML = '';
+
+            for (let key in filters) {
+                if (filters[key]) {
+                    const filterTag = document.createElement('div');
+                    filterTag.classList.add('filter-tag');
+                    filterTag.innerHTML = `${filters[key]} <button class="remove-filter" onclick="removeFilter('${key}')">&times;</button>`;
+                    activeFiltersContainer.appendChild(filterTag);
                 }
-            });
+            }
+            searchMovies();
         }
 
-        // Filter by Type (فلم or مسلسل)
+        function selectGenre(genre) {
+            filters.genre = genre;
+            closeModal();
+            updateActiveFilters();
+        }
+
         function selectType(type) {
-            const movies = document.querySelectorAll('.movie-item');
-            movies.forEach(movie => {
-                const movieType = movie.getAttribute('data-type');
-                movie.style.display = movieType === type ? 'block' : 'none';
-            });
+            filters.type = type;
+            updateActiveFilters();
         }
 
-        // Search by Title and Year
+        function removeFilter(filterKey) {
+            filters[filterKey] = '';
+            updateActiveFilters();
+        }
+
         function searchMovies() {
             const searchInput = document.getElementById('searchInput').value.toLowerCase();
-            const yearInput = document.getElementById('yearInput').value;
+            filters.year = document.getElementById('yearInput').value;
+
             const movies = document.querySelectorAll('.movie-item');
             movies.forEach(movie => {
                 const title = movie.getAttribute('data-title').toLowerCase();
                 const year = movie.getAttribute('data-year');
-                if ((title.includes(searchInput) || searchInput === '') && 
-                    (year === yearInput || yearInput === '')) {
-                    movie.style.display = 'block';
-                } else {
-                    movie.style.display = 'none';
-                }
+                const genre = movie.getAttribute('data-genre');
+                const type = movie.getAttribute('data-type');
+                
+                const matchesSearch = !searchInput || title.includes(searchInput);
+                const matchesYear = !filters.year || year === filters.year;
+                const matchesGenre = !filters.genre || genre === filters.genre;
+                const matchesType = !filters.type || type === filters.type;
+                
+                movie.style.display = (matchesSearch && matchesYear && matchesGenre && matchesType) ? 'block' : 'none';
             });
         }
     </script>
+
 </body>
 </html>
